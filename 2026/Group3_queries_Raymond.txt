@@ -1,0 +1,104 @@
+SIMPLE
+
+Query 1
+
+    Description:
+        Display the playlist_id, playlist_name, follower_count, and share_count, 
+        where the engagement has a follower count between 7000-10000, 
+        AND a share count above 1200
+
+    db.Playlists.find(
+    {$and: [
+        {$or: 
+        [{"engagement.follower_count": {$gte: 7000}},
+        {"engagement.follower_count": {$lte: 10000}}]
+        },
+        {"engagement.shares_count": {$gte: 1200}} 
+    ]},
+    {"playlist_info.playlist_id": 1, "playlist_info.playlist_name": 1, "engagement.follower_count": 1, "engagement.shares_count": 1}
+    )
+
+Query 2
+
+    Description:
+        Display the album_id, album_name, release_date, and genre of albums where their
+        genre contains either Hip-Hop or Rock.
+
+    db.Albums.find(
+        {$or: 
+            [{"album_info.genre": {$regex: "Hip-Hop"}},
+            {"album_info.genre": {$regex: "Rock"}}]
+        },
+        {"album_info.album_id": 1, "album_info.album_name": 1, "album_info.release_date": 1, "album_info.genre": 1}
+    )
+
+Query 3
+
+    Description: 
+        Display the playlist_name, song_name, date_added, and visibility of playlists where
+        songs were added before the year 2023 AND if their visibility is false
+
+    db.Playlists.find(
+        {$and: 
+            [{"track_list.date_added": {$lt: ISODate("2023-01-01T00:00:00Z")}},
+            {visibility: {$eq: false}}]
+        },
+        {"playlist_info.playlist_name": 1, "track_list.song_name": 1, "track_list.date_added": 1, visibility: 1}
+    )
+
+ADVANCED
+
+Query 1
+
+    Description
+        Checking if an album is classic (before 2000s) or modern (after 2000s)
+
+    db.Albums.aggregate([
+        {
+            $project: {
+                _id: 0, 
+                "album_info.album_name": 1,
+                release_date: "$album_info.release_date",
+                album_category: {
+                    $cond: {
+                        if: {$lt: [ "$album_info.release_date", ISODate("2000-01-01")]},
+                        then: "Classic Album",
+                        else: "Modern Album"
+                    }
+                }
+            }
+        }
+    ]);
+
+Query 2
+
+Counting how many playlists were created each year
+
+db.Playlists.aggregate([
+  {
+    $group: {
+      _id: { $year: "$playlist_info.date_created" },
+      total_playlists: { $sum: 1 }
+    }
+  }
+]);
+
+Query 3
+
+Calculating Average Streams Per Unit
+
+db.Albums.aggregate([
+  {
+    $project: {
+      _id: 0,
+      "performance.total_streams": 1,
+      "performance.sale_units": 1,
+      album: "$album_info.album_name",
+      avg_streams_per_unit: {
+        $divide: ["$performance.total_streams", "$performance.sale_units"]
+      }
+    }
+  },
+  { $sort: { avg_streams_per_unit: -1 } }
+]);
+
