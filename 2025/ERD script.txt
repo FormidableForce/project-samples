@@ -1,0 +1,34 @@
+Hello everybody, we are in group 1 going to present project 2 for BDD200 with topic of
+hospital management system.
+
+
+Luka (Department, Doctors)
+- It's a list of departments with the pk dept_id, 
+each dept gets its own bugdet and unique phone numbers.
+
+- And dept_id is also being used as the fk for the doctors table,
+which is a list of all the doctors registered within the hospital
+management system with the pk being the doctor_id.
+
+Khang (Patients, Appointments)
+- patients table is a list of all the patients registered under our hospital
+management system, with the unique identifier/pk being the patient_id,
+and it stores all the personal details about our patients such as fname, 
+lname etc.
+
+- patient_id is also being used as the fk for multiple other tables, one
+of them being the appointments table.
+
+- this table hold the data about the appointment booking done by the patients,
+with their designated doctors, identified by the fk doctor_id.
+
+Rishi (Medical Records, Prescription, Medication)
+- Then we have the medical records table, with the pk being the record_id,
+alog with two other fk's doctor_id & patient_id. and this table holds the data about the care
+administered.
+
+- Then we move on to the prescriptions table which has the pk prec_id, 
+its a transactional table that holds doctors accountable for the medication prescribed.
+
+- And at last we have the medications table that hold the data about the stock that the hospital
+has.
